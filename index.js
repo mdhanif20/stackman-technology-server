@@ -38,35 +38,23 @@ async function run(){
         await client.connect();
 
         // for sending data on database
-        const database = client.db("ApolloHospital");
-        const appointmentCollection = database.collection("appointments");
-        const usersCollection = database.collection("users");
-        
-        app.get("/deshboard/appointments",async(req,res)=>{
-          const appointments = appointmentCollection.find({});
-          const result = await appointments.toArray();
-          res.send(result)
-        })
-        /* app.put('/deshboard/appointments',async(req,res)=>{
-          const user= req.body;
-          console.log(user)
-          const filter = {_id: user.id};
-          console.log(filter)
-          const updateDoc = {
-            $set: {
-              visited:"Visited"
-            }
-          }
-          const result = await appointmentCollection.updateOne(filter,updateDoc)
-          res.json(result)
-        }) */
-        app.get("/appointments",verifyToken,async(req,res)=>{
+        const database = client.db("StickmanTechnology");
+        const appointmentCollection = database.collection("userInfo");
+        const usersCollection = database.collection("userloginData");
+
+        app.get("/singleUserInfo",async(req,res)=>{
           const email = req.query.email;
           const date = req.query.date ;
           const query = {email:email, date:date};
           const result = appointmentCollection.find(query);
           const appointments = await result.toArray();
           res.json(appointments);
+        })
+
+        app.get("/userInfo",async(req,res)=>{
+          const appointments = appointmentCollection.find({});
+          const result = await appointments.toArray();
+          res.send(result)
         })
 
         app.get("/users/:email",async(req,res)=>{
@@ -80,46 +68,17 @@ async function run(){
           res.json({admin:isAdmin})
         })
 
-        app.post("/appointments",async(req,res)=>{
+        app.post("/userInfo",async(req,res)=>{
           const appointment = req.body;
           const result = await appointmentCollection.insertOne(appointment);
           res.json(result)
         })
         
-        app.post("/users",async(req,res)=>{
+        app.post("/userlogin",async(req,res)=>{
           const user = req.body;
           const result = await usersCollection.insertOne(user);
           res.json(result)
         })
-
-        app.put('/users',async(req,res)=>{
-          const user= req.body;
-          const filter = {email: user.email};
-          const options = {upsert:true};
-          const updateDoc = {$set:user};
-          const result = await usersCollection.updateOne(filter,updateDoc,options)
-          res.json(result);
-        })
-        
-        app.put('/users/admin',verifyToken,async(req,res)=>{
-          const user= req.body;
-          const requester = req.decodedEmail;
-          if(requester){
-            const requesterAccount = await usersCollection.findOne({email:requester});
-            if(requesterAccount.role === 'admin'){
-              const filter = {email: user.email};
-              const options = {upsert:true};
-              const updateDoc = {$set:user};
-              const result = await usersCollection.updateOne(filter,updateDoc,options)
-              res.json(result);
-            }
-          }
-          else{
-            res.status(403).json({message:"You don't have access to make admin."})
-          }
-        })
-
-        
     }
     finally{
         // await client.close(); 
@@ -129,17 +88,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('Hello Doctors Portal Server.')
+  res.send('Stackman Technology')
 })
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`)
 })
-
-
-
- /* app.get("/users")
-    app.get("/users/:id")
-    app.post("/users")
-    app.put("/users/:id")
-    app.delete("/users/:id") */
