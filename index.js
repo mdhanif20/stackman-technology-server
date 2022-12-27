@@ -52,9 +52,11 @@ async function run(){
         })
 
         app.get("/userInfo",async(req,res)=>{
-          const appointments = appointmentCollection.find({});
+          const date = req.query.date;
+          const query = {date:date}
+          const appointments = appointmentCollection.find(query);
           const result = await appointments.toArray();
-          res.send(result)
+          res.json(result)
         })
 
         app.get("/users/:email",async(req,res)=>{
